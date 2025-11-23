@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Store</title>
+<style>
+/* Basic Reset */
+* {
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background:#f4f4f4; 
+    overflow-x: hidden;
+}
+
+header { 
+    background:white; 
+    padding:15px; 
+    display:flex; 
+    justify-content: space-between; 
+    align-items:center;
+    border-bottom:1px solid #ddd; 
+    position: sticky; 
+    top:0; z-index:100;
+}
+
+.brand { 
+    display:flex; 
+    align-items:center; 
+    gap:10px;
+}
+
+.logo {
+    background:#4b4bff; 
+    color:white; 
+    padding:10px 15px; 
+    border-radius:8px; 
+    font-weight:bold; 
+    font-size:18px;
+}
+
+.search-wrapper { 
+    width:40%;
+}
+
+.search-wrapper input { 
+    width:70%; 
+    padding:8px;
+}
+
+#sortSelect {
+    padding:8px;
+}
+
+.layout { 
+    display:flex; 
+    padding:15px; 
+    gap:15px;
+}
+
+.sidebar { 
+    width:260px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px;
+}
+
+.panel { 
+    background:white; 
+    padding:15px; 
+    margin-bottom:0; 
+    border-radius:8px; 
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.section-title { 
+    font-weight:bold; 
+    margin-bottom:10px;
+}
+
+.main {flex:1;}
+
+.grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+    gap:15px;
+}
+
+.card {
+    background:white; 
+    padding:10px; 
+    border-radius:10px; 
+    box-shadow:0 2px 5px rgba(0,0,0,0.1); 
+    transition:0.3s;
+}
+.card:hover { transform: scale(1.03);}
+.card img { 
+    width:100%; 
+    height:150px; 
+    border-radius:8px; 
+    object-fit:cover;
+}
+
+.card .title { 
+    font-weight:bold; 
+    margin-top:8px;
+}
+
+.card .price { 
+    color:#007b00; 
+    font-weight:bold;
+}
+
+.add-btn { 
+    margin-top:10px; 
+    width:100%; 
+    padding:10px; 
+    background:#4b4bff; 
+    color:white;
+    border:none; 
+    border-radius:6px; 
+    cursor:pointer;
+}
+
+.add-btn:hover { background:#2a2ad8; }
+
+.cart-panel, .checkout-panel {display:none;}
+
+.cart-panel.open, .checkout-panel.open {
+    display:block;
+}
+.cart-panel .cart-item, #cartItemsWrap .cart-item { 
+    display:flex; 
+    align-items:center; 
+    gap:10px; 
+    padding:10px 0; 
+    border-bottom:1px solid #ddd;
+}
+
+.cart-panel img {
+    width:60px; 
+    height:60px; 
+    border-radius:6px; 
+    object-fit:cover;
+}
+
+.qty-controls button { 
+    padding:4px 8px; 
+    border:none; 
+    background:#ddd; 
+    cursor:pointer;
+}
+
+.remove-btn {
+    background:#ff3d3d; 
+    color:white; 
+    border:none; 
+    padding:6px 10px; 
+    border-radius:6px; 
+    cursor:pointer;
+}
+
+.remove-btn:hover { 
+    background:#d00;
+}
+
+.side-btn {
+    margin: 12px 0 0 0;
+    width: 100%;
+    padding: 12px;
+    background: #4b4bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.side-btn.cancel {
+    background: #aaa;
+    margin-top: 8px;
+}
+
+.side-btn.cancel:hover {
+    background:#888;
+}
+
+.side-btn:hover {
+    background:#2a2ad8;
+}
+
+.checkout-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-top:10px;
+}
+
+.checkout-panel input {
+    width:100%;
+    margin:5px 0;
+    padding:8px;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="brand">
+        <div class="logo">PS</div>
+        <h2>Product Store</h2>
+    </div>
+    <div class="search-wrapper">
+        <input id="searchInput" placeholder="Search products...">
+        <select id="sortSelect">
+            <option value="relevance">Relevance</option>
+            <option value="price-asc">Price Low → High</option>
+            <option value="price-desc">Price High → Low</option>
+        </select>
+    </div>
+    <button id="resetBtn">Reset</button>
+</header>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <!-- Categories -->
+        <div class="panel">
+            <div class="section-title">Categories</div>
+            <label><input type="checkbox" class="cat" value="Gadgets"> Gadgets</label><br>
+            <label><input type="checkbox" class="cat" value="Sports"> Sports</label><br>
+            <label><input type="checkbox" class="cat" value="Appliances"> Appliances</label><br>
+            <label><input type="checkbox" class="cat" value="Accessories"> Accessories</label><br>
+            <label><input type="checkbox" class="cat" value="Makeup"> Makeup</label><br>
+            <label><input type="checkbox" class="cat" value="Toy"> Toys</label><br>
+            <label><input type="checkbox" class="cat" value="Additional">Additional </label>
+        </div>
+
+        <!-- Rating -->
+        <div class="panel">
+            <div class="section-title">Rating</div>
+            <input type="range" id="ratingRange" min="0" max="5" step="0.5" value="0">
+            <p>Min: <span id="ratingVal">0</span> ⭐</p>
+        </div>
+
+        <!-- Availability -->
+        <div class="panel">
+            <div class="section-title">Availability</div>
+            <label><input type="checkbox" class="avail" value="In Stock"> In Stock</label><br>
+            <label><input type="checkbox" class="avail" value="Out of Stock"> Out of Stock</label>
+        </div>
+
+        <!-- CART PANEL -->
+        <div class="panel cart-panel" id="cartPanel">
+            <h2>Your Cart</h2>
+            <div id="cartItemsWrap"></div>
+            <h3>Total: ₹<span id="totalVal">0</span></h3>
+            <button class="side-btn" id="openCheckout">Checkout</button>
+            <button class="side-btn cancel" id="cancelCartBtn">Cancel</button>
+        </div>
+
+        <!-- CHECKOUT PANEL -->
+        <div class="checkout-panel" id="checkoutPanel">
+            <h3>Enter Payment Details</h3>
+            <input id="payerName" placeholder="Name">
+            <input id="cardNumber" placeholder="Card Number">
+            <button class="side-btn" id="payNow">Pay Now</button>
+            <button class="side-btn cancel" id="cancelPayBtn">Cancel</button>
+        </div>
+
+        <!-- OPEN CART BUTTON -->
+        <button class="side-btn" id="showCartBtn" style="margin-top:6px;">View Cart (<span id="cartCount">0</span>)</button>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div class="main">
+        <div id="productsGrid" class="grid"></div>
+    </div>
+</div>
+
+<script>
+// ---------- PRODUCT DATA ----------
+const products = [
+    { id:1, name:"Dell Laptop", price:45000, rating:4.2, cat:"Gadgets", availability:"In Stock", img:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8" },
+    { id:2, name:"Canon EOS Camera", price:94990, rating:4.5, cat:"Gadgets", availability:"Out of Stock", img:"https://m.media-amazon.com/images/I/61JQs+UNEdL._AC_UY327_FMwebp_QL65_.jpg" },
+    { id:3, name:"iPhone 13", price:75000, rating:3.9, cat:"Gadgets", availability:"In Stock", img:"https://m.media-amazon.com/images/I/61cwywLZR-L._AC_UY327_FMwebp_QL65_.jpg" },
+    { id:4, name:"Air Conditioner", price:34900, rating:3.5, cat:"Appliances", availability:"In Stock", img:"https://m.media-amazon.com/images/I/61mOVGinDdL._SX679_.jpg" },
+    { id:5, name:"Running Shoes", price:1299, rating:4.4, cat:"Sports", availability:"In Stock", img:"https://m.media-amazon.com/images/I/711w4urOaiL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:6, name:"Samsung Galaxy", price:85000, rating:4.4, cat:"Gadgets", availability:"Out of Stock", img:"https://m.media-amazon.com/images/I/717Q2swzhBL._AC_UY327_FMwebp_QL65_.jpg" },
+    { id:7, name:"Boat Airpods", price:899, rating:4.4, cat:"Electronics", availability:"In Stock", img:"https://m.media-amazon.com/images/I/61kReoWGtHL.jpg" },
+    { id:8, name:"Wireless Mouse", price:5000, rating:4.4, cat:"Gadgets", availability:"In Stock", img:"https://m.media-amazon.com/images/I/51vMo-pHZ5L._AC_UY327_FMwebp_QL65_.jpg" },
+    { id:9, name:"Water Bottle", price:299, rating:3.4, cat:"Food", availability:"In Stock", img:"https://m.media-amazon.com/images/I/61J2mlM-FSL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:10, name:"Badminton Racket", price:4000, rating:4.4, cat:"Sports", availability:"In Stock", img:"https://m.media-amazon.com/images/I/61ZJMYfJTHL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:11, name:"Lakme LipStick", price:257, rating:4.0, cat:"Makeup", availability:"In Stock", img:"https://m.media-amazon.com/images/I/515k8rhPdGL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:12, name:"Lakme Blush", price:206, rating:3.4, cat:"Makeup", availability:"In Stock", img:"https://m.media-amazon.com/images/I/51pkef+r3QL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:13, name:"Socks", price:285, rating:4.4, cat:"Sports", availability:"Out of Stock", img:"https://m.media-amazon.com/images/I/81JGwp4flIL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:14, name:"Silver Chain", price:2099, rating:2.4, cat:"Accessories", availability:"In Stock", img:"https://m.media-amazon.com/images/I/41nWM7A+E+L._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:15, name:"Silver Ring", price:1599, rating:4.4, cat:"Accessories", availability:"Out of Stock", img:"https://m.media-amazon.com/images/I/51tfskg9XRL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:16, name:"Keychain", price:251, rating:3.4, cat:"Addtitional", availability:"In Stock", img:"https://m.media-amazon.com/images/I/41ldvQXDi+L._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:17,name:"Capybara", price:751, rating:4.4, cat:"Toy", availability:"In Stock", img:"https://m.media-amazon.com/images/I/61DgKS4KJxL._SX522_.jpg" },
+    { id:18, name:"Mixer", price:9922, rating:4.4, cat:"Appliances", availability:"In Stock", img:"https://m.media-amazon.com/images/I/61oHdFNlkVL._AC_SX416_CB1169409_QL70_.jpg" },
+    { id:19, name:"Travel Bag", price:199, rating:4.4, cat:"Additional", availability:"In Stock", img:"https://images-eu.ssl-images-amazon.com/images/I/71SU3OObmlL._AC_UL450_SR450,320_.jpg" },
+    { id:20, name:"Hotwheels", price:373, rating:4.9, cat:"Toy", availability:"In Stock", img:"https://m.media-amazon.com/images/I/81W+9pO5DnL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:21, name:"Water Heater", price:499, rating:4.4, cat:"Appliances", availability:"Out of Stock", img:"https://images-eu.ssl-images-amazon.com/images/I/71-PiTm9pTL._AC_UL450_SR450,320_.jpg" },
+    { id:22, name:"Rolex Watch", price:6420, rating:4.4, cat:"Acessoseries", availability:"In Stock", img:"https://m.media-amazon.com/images/I/715XkQ9cfwL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:23, name:"Drift car", price:2499, rating:4.4, cat:"Toy", availability:"Out of Stock", img:"https://m.media-amazon.com/images/I/71Ob1SuU1nL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:24, name:"Anime Keychain", price:199, rating:4.4, cat:"Additional", availability:"In Stock", img:"https://m.media-amazon.com/images/I/81QyF6ci8HL._AC_UL480_FMwebp_QL65_.jpg" },
+    { id:25, name:"Penguin", price:312, rating:4.4, cat:"Toy", availability:"In Stock", img:"https://m.media-amazon.com/images/I/513TfTuul7L._AC_UL480_FMwebp_QL65_.jpg" }
+    // ...rest (repeat iPhone if needed)
+];
+let cart = [];
+// ---------- DISPLAY PRODUCTS ----------
+function loadProducts(list) {
+    const grid = document.getElementById("productsGrid");
+    grid.innerHTML = "";
+    list.forEach(p => {
+        grid.innerHTML += `
+        <div class="card">
+            <img src="${p.img}">
+            <div class="title">${p.name}</div>
+            <div class="price">₹${p.price}</div>
+            <div>${p.rating} ⭐</div>
+            <div><b>${p.availability}</b></div>
+            <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+        </div>`;
+    });
+}
+loadProducts(products);
+
+// ---------- FILTERS ----------
+document.getElementById("searchInput").addEventListener("keyup", applyFilters);
+document.getElementById("ratingRange").addEventListener("input", () => {
+    document.getElementById("ratingVal").innerText = ratingRange.value;
+    applyFilters();
+});
+document.querySelectorAll(".cat").forEach(c => c.onchange = applyFilters);
+document.querySelectorAll(".avail").forEach(a => a.onchange = applyFilters);
+document.getElementById("sortSelect").addEventListener("change", applyFilters);
+
+function applyFilters() {
+    let list = [...products];
+    const s = searchInput.value.toLowerCase();
+    list = list.filter(p => p.name.toLowerCase().includes(s));
+    // Category
+    const selected = [...document.querySelectorAll(".cat:checked")].map(c => c.value);
+    if (selected.length > 0) list = list.filter(p => selected.includes(p.cat));
+    // Rating
+    list = list.filter(p => p.rating >= ratingRange.value);
+    // Availability
+    const av = [...document.querySelectorAll(".avail:checked")].map(a => a.value);
+    if (av.length > 0) list = list.filter(p => av.includes(p.availability));
+    // Sort
+    if (sortSelect.value === "price-asc") list.sort((a,b)=>a.price-b.price);
+    if (sortSelect.value === "price-desc") list.sort((a,b)=>b.price-a.price);
+    loadProducts(list);
+}
+
+// ---------- RESET ----------
+document.getElementById("resetBtn").onclick = () => {
+    searchInput.value="";
+    ratingRange.value=0;
+    ratingVal.innerText="0";
+    document.querySelectorAll(".cat").forEach(c=>c.checked=false);
+    document.querySelectorAll(".avail").forEach(a=>a.checked=false);
+    sortSelect.value="relevance";
+    loadProducts(products);
+};
+
+// ---------------- INLINE CART PANEL LOGIC -------------
+const cartPanel = document.getElementById("cartPanel");
+const cartCount = document.getElementById("cartCount");
+const cartItemsWrap = document.getElementById("cartItemsWrap");
+const totalVal = document.getElementById("totalVal");
+const showCartBtn = document.getElementById("showCartBtn");
+const openCheckoutBtn = document.getElementById("openCheckout");
+const cancelCartBtn = document.getElementById("cancelCartBtn");
+const checkoutPanel = document.getElementById("checkoutPanel");
+const cancelPayBtn = document.getElementById("cancelPayBtn");
+const payNow = document.getElementById("payNow");
+
+// Click "View Cart" opens cartPanel, closes payment panel; disables if empty
+showCartBtn.onclick = function(){
+    if (cart.length === 0) return;
+    cartPanel.classList.add('open');
+    checkoutPanel.classList.remove('open');
+};
+
+// Cancel in cart closes cartPanel
+cancelCartBtn.onclick = function(){
+    cartPanel.classList.remove('open');
+};
+
+// Checkout opens payment
+openCheckoutBtn.onclick = ()=>{
+    cartPanel.classList.remove('open');
+    checkoutPanel.classList.add('open');
+};
+
+// Cancel on payment closes payment
+cancelPayBtn.onclick = function(){
+    checkoutPanel.classList.remove('open');
+};
+
+// Pay now
+payNow.onclick = function(){
+    alert("Payment Successful!");
+    cart = [];
+    updateCart();
+    checkoutPanel.classList.remove('open');
+};
+
+// ---------- CART ----------
+function addToCart(id) {
+    const p = products.find(x=>x.id===id);
+    const exists = cart.find(x=>x.id===id);
+    if (exists) exists.qty++;
+    else cart.push({...p, qty:1});
+    updateCart();
+    cartPanel.classList.add('open');
+    checkoutPanel.classList.remove('open');
+}
+function removeFromCart(id) {
+    cart = cart.filter(x => x.id !== id);
+    updateCart();
+    if(cart.length === 0) cartPanel.classList.remove('open');
+}
+function updateCart() {
+    cartItemsWrap.innerHTML="";
+    let total=0;
+    cart.forEach(item=>{
+        total += item.price * item.qty;
+        cartItemsWrap.innerHTML += `
+            <div class="cart-item">
+                <img src="${item.img}">
+                <div>
+                    <b>${item.name}</b><br>
+                    ₹${item.price} × ${item.qty}
+                </div>
+                <div class="qty-controls">
+                    <button onclick="decQty(${item.id})">-</button>
+                    <button onclick="incQty(${item.id})">+</button>
+                </div>
+                <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+            </div>`;
+    });
+    cartCount.innerText = cart.length;
+    totalVal.innerText = total;
+    showCartBtn.innerHTML = `View Cart (<span id="cartCount">${cart.length}</span>)`;
+    if(cart.length === 0) cartPanel.classList.remove('open');
+}
+function incQty(id){
+    cart.find(x=>x.id===id).qty++;
+    updateCart();
+}
+function decQty(id){
+    let item = cart.find(x=>x.id===id);
+    if(item.qty > 1) item.qty--;
+    else removeFromCart(id);
+    updateCart();
+}
+</script>
+</body>
+</html>
